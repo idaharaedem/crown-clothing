@@ -1,7 +1,7 @@
 import React from 'react';
 import './App.css';
 import Homepage from './pages/homepage/homepage';
-import { Switch, Route } from 'react-router-dom';
+import { Switch, Route, Redirect } from 'react-router-dom';
 import ShopPage from './pages/shop/shop';
 import Header from './components/header/header';
 import SignInAndSignUpPage from './pages/sign-in-and-sign-up/sign-in-and-sign-up'
@@ -44,16 +44,24 @@ class App extends React.Component {
       <Header/>
         <Switch>
           <Route exact path='/' component={Homepage}/>
-          <Route exact path='/shop' component={ShopPage}/>
-          <Route exact path='/signin' component={SignInAndSignUpPage}/>
+          <Route path='/shop' component={ShopPage}/>
+          <Route exact path='/signin' render={() => 
+            this.props.currentUser 
+            ? <Redirect to='/'/> 
+            : <SignInAndSignUpPage/> }/>
         </Switch>
       </div>
     );
   }
 }
 
+//prevent the user accessing signing in if he/she are already signed in
+const mapStateToProps = ({user}) => ({
+  currentUser: user.currentUser
+})
+
 const mapDispatchProps = dispatch => ({
   setCurrentUser: user => dispatch(setCurrentUser(user))
 });
 
-export default connect(null, mapDispatchProps)(App);
+export default connect(mapStateToProps, mapDispatchProps)(App);
